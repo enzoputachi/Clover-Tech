@@ -56,6 +56,7 @@ const Auth = () => {
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
+
               <TabsContent value="login">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
@@ -81,6 +82,7 @@ const Auth = () => {
                   </Button>
                 </form>
               </TabsContent>
+
               <TabsContent value="register">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
