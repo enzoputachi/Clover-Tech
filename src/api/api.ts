@@ -1,5 +1,8 @@
 import axios from "axios";
 
+// type AxiosInstance = axios.AxiosInstance;
+
+
 const api = axios.create({
     baseURL: "http://localhost:4200",
     headers: {
@@ -27,5 +30,8 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 )
+
+
+// Example API utility
 
 export default api;
