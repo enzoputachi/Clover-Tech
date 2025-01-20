@@ -19,19 +19,30 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  error: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if(token) {
-      api.get<User>("/api/users", { headers: })
-    }
-  })
+    const initializeAuth = async() => {
+      const token = localStorage.getItem("authToken");
+      if(token) {
+        try {
+          const response = await api.get<User>("/api/users/profile")
+          setUser(response.data)
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+          logout();
+        }
+      }
+    };
+    initializeAuth();
+  }, [])
 
   // A register function
   const register = async (name: string, email: string, password: string) => {
@@ -46,7 +57,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: user.name,
         photoURL: user.photoURL,
       })
+      setError(null)
     } catch (error) {
+      setError(error.response?.data.message || "Registration failed");
       console.error("Registration failed:", error.response?.data || error.message);
       throw error;
     }
@@ -55,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // login function 
   const login = async (email: string, password: string) => {
     try {
+      setError(null);
       const response = await api.post<AuthResponse>("/api/users/login", { email, password });
       const { token, user } = response.data;
 
@@ -66,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         photoURL: user.photoURL,
       })
     } catch (error) {
+      setError(error.response?.data.message || "Login failed");
       console.error("Login failed:", error.response?.data || error.message);
       throw error;
     }
@@ -74,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     localStorage.removeItem("authToken");
     setUser(null);
+    setError(null);
   };
 
   return (
@@ -84,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         login,
         logout,
+        error,
       }}
     >
       {children}
