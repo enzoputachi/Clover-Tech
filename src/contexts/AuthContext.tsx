@@ -1,5 +1,6 @@
 import api from "@/api/api";
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
 
 interface User {
   id: string;
@@ -27,6 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // const navigate = useNavigate();
 
   useEffect(() => {
     const initializeAuth = async() => {
@@ -47,8 +49,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // A register function
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await api.post<AuthResponse>("/api/users/auth", {name, email, password});
+      const response = await api.post<AuthResponse>("/api/users/", {name, email, password});
       const { token, user } = response.data;
+
+      if (!user) {
+        throw new Error("User data is missing in the response.");
+      }
 
       localStorage.setItem("authToken", token);
       setUser({
@@ -90,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("authToken");
     setUser(null);
     setError(null);
+    // navigate("/auth")
   };
 
   return (
