@@ -12,12 +12,14 @@ import { useToast } from "@/hooks/use-toast";
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const { login, register } = useAuth();
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
@@ -39,6 +41,24 @@ const Auth = () => {
     }
   };
 
+  const handleRegister = async(e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await register(name, email, password);
+      toast({ title: "Welcome!", description: "Your account has been created." });
+    } catch (error) {
+      toast({ title: "Error", description: "Registration failed. Please try again.", variant: "destructive" });
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -58,7 +78,7 @@ const Auth = () => {
               </TabsList>
 
               <TabsContent value="login">
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Input
                       type="email"
@@ -66,6 +86,7 @@ const Auth = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      autoComplete="email"
                     />
                   </div>
                   <div className="space-y-2">
@@ -75,6 +96,7 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
+                      autoComplete="current-password"
                     />
                   </div>
                   <Button className="w-full" disabled={isLoading}>
@@ -84,9 +106,14 @@ const Auth = () => {
               </TabsContent>
 
               <TabsContent value="register">
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleRegister} className="space-y-4">
                   <div className="space-y-2">
-                    <Input placeholder="Full Name" required />
+                    <Input 
+                      placeholder="Full Name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      autoComplete="name"
+                      required />
                   </div>
                   <div className="space-y-2">
                     <Input
@@ -95,6 +122,7 @@ const Auth = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      autoComplete="email"
                     />
                   </div>
                   <div className="space-y-2">
@@ -104,10 +132,17 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
+                      autoComplete="new-password"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Input type="password" placeholder="Confirm Password" required />
+                    <Input 
+                      type="password" 
+                      placeholder="Confirm Password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      autoComplete="new-password"
+                      required />
                   </div>
                   <Button className="w-full" disabled={isLoading}>
                     {isLoading ? "Creating account..." : "Create Account"}
