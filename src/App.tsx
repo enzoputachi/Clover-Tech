@@ -40,7 +40,7 @@ function App() {
             <Route path="/auth" element={<Auth />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
-            {/* <Route path="/admin" element={<Admin />} /> */}
+            <Route path="/admin" element={<Admin />} />
             
             {/* Protected routes */}
             <Route
@@ -52,12 +52,12 @@ function App() {
               }
             />
             <Route
-              path="/admin/*"
-              element={
-                <ProtectedRoute>
-                  <Admin />
-                </ProtectedRoute>
-              }
+              // path="/admin/*"
+              // element={
+              //   <ProtectedRoute>
+              //     <Admin />
+              //   </ProtectedRoute>
+              // }
             />
           </Routes>
           <Toaster />
