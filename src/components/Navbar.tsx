@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { items } = useCart();
+  const { items = [] } = useCart();
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
