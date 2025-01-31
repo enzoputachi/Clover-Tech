@@ -27,6 +27,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const storedUser = localStorage.getItem("user") //Get user from localstorage
   const [error, setError] = useState<string | null>(null);
   // const navigate = useNavigate();
 
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const response = await api.get<User>("/api/users/profile")
           setUser(response.data)
+          localStorage.setItem("user", JSON.stringify(response.data)) //update user data
         } catch (error) {
           console.error("Failed to fetch user:", error);
           logout();
@@ -57,12 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       localStorage.setItem("authToken", token);
-      setUser({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        photoURL: user.photoURL,
-      })
+      localStorage.setItem("user", JSON.stringify(user)) // save user data
+
+      setUser(user)
       setError(null)
     } catch (error) {
       setError(error.response?.data.message || "Registration failed");
@@ -79,12 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { token, user } = response.data;
 
       localStorage.setItem("authToken", token);
-      setUser({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        photoURL: user.photoURL,
-      })
+      localStorage.setItem("user", JSON.stringify(user)) // save user data
+
+      setUser(user)
     } catch (error) {
       setError(error.response?.data.message || "Login failed");
       console.error("Login failed:", error.response?.data || error.message);
@@ -94,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("user") // remove user data
     setUser(null);
     setError(null);
     // navigate("/auth")
