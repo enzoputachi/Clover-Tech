@@ -27,18 +27,29 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const storedUser = localStorage.getItem("user") //Get user from localstorage
+  // const storedUser = localStorage.getItem("user") //Get user from localstorage
   const [error, setError] = useState<string | null>(null);
   // const navigate = useNavigate();
 
   useEffect(() => {
     const initializeAuth = async() => {
       const token = localStorage.getItem("authToken");
-      if(token) {
+      const storedUser = localStorage.getItem("user");
+
+
+      if(token && storedUser) {
         try {
-          const response = await api.get<User>("/api/users/profile")
-          setUser(response.data)
-          localStorage.setItem("user", JSON.stringify(response.data)) //update user data
+
+          const parsedUser = JSON.parse(storedUser);
+
+          const user: User = {
+            id: parsedUser._id, // Map _id to id if needed
+            email: parsedUser.email,
+            name: parsedUser.name,
+            photoURL: parsedUser.photoURL,
+          };
+          
+          setUser(user);
         } catch (error) {
           console.error("Failed to fetch user:", error);
           logout();
