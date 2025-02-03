@@ -4,10 +4,10 @@ export interface CourseOutline {
 }
 
 export interface Course {
-  id: string;
+  _id: string;
   title: string;
   description: string;
-  price: string;
+  price: number;
   salePrice?: string;
   duration: string;
   image: string;
