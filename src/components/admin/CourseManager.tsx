@@ -16,6 +16,7 @@ export const CourseManager = () => {
       try {
         const { data } = await api.get<Course[]>('/api/courses')
         setCourses(data)
+        console.log(data);
       } catch (error) {
         toast({ title: "Error", description: "Failed to fetch courses"})
       }
