@@ -9,13 +9,13 @@ import { useNavigate } from "react-router-dom";
 import api from "@/api/api";
 
 interface Course {
-  id: string;
+  _id: string;
   title: string;
   description: string;
-  price: string;
+  price: number;
   duration: string;
   image: string;
-  outline: Array<{ id: string; point: string; }>;
+  outline: Array<{ _id: string; point: string; }>;
 }
 
 const Courses = () => {
@@ -116,6 +116,7 @@ const Courses = () => {
       try {
         const response = await api.get<Course[]>('/api/courses');
         setCourses(response.data)
+        console.log(response.data);
       } catch (error) {
         setError('Failed to get courses')
       } finally {
@@ -141,9 +142,9 @@ const Courses = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {courses.map((course) => (
             <Card 
-              key={course.id} 
+              key={course._id} 
               className="overflow-hidden hover:shadow-lg transition-all duration-300 relative"
-              onMouseEnter={() => setHoveredCourse(course.id)}
+              onMouseEnter={() => setHoveredCourse(course._id)}
               onMouseLeave={() => setHoveredCourse(null)}
             >
               <div className="relative">
@@ -152,12 +153,12 @@ const Courses = () => {
                   alt={course.title}
                   className="w-full h-48 object-cover"
                 />
-                {hoveredCourse === course.id && (
+                {hoveredCourse === course._id && (
                   <div className="absolute inset-0 bg-black bg-opacity-75 text-white p-4 overflow-y-auto transition-opacity duration-300">
                     <h4 className="font-bold mb-2">Course Outline:</h4>
                     <ul className="list-disc list-inside">
                       {course.outline.map(point => (
-                        <li key={`${course.id}-${point.id}`} className="text-sm mb-1">{point.point}</li>
+                        <li key={`${course._id}-${point?._id}`} className="text-sm mb-1">{point.point}</li>
                       ))}
                     </ul>
                   </div>
