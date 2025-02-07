@@ -32,8 +32,8 @@ export const CourseManager = () => {
   const handleSave = async () => {
     if (editingCourse) {
       try {
-        await api.patch(`/api/courses/${editingCourse.id}`, editingCourse);
-        setCourses((prev) => prev.map((c) => (c.id === editingCourse.id ? editingCourse : c)));
+        await api.patch(`/api/courses/${editingCourse._id}`, editingCourse);
+        setCourses((prev) => prev.map((c) => (c._id === editingCourse._id ? editingCourse : c)));
         setEditingCourse(null);
         toast({ title: "Course updated", description: "Your changes have been saved successfully."})
       } catch (error) {
@@ -45,7 +45,7 @@ export const CourseManager = () => {
   const handleDelete = async (id: string) => {
     try {
       await api.delete(`/api/courses/${id}`)
-      setCourses(courses.filter((c) => c.id !== id));
+      setCourses(courses.filter((c) => c._id !== id));
       toast({
         title: "Course deleted",
         description: "The course has been removed successfully.",
@@ -57,10 +57,10 @@ export const CourseManager = () => {
 
   const handleAdd = async () => {
     const newCourse: Course = {
-      id: Date.now().toString(),
+      _id: "",
       title: "New Course",
       description: "Course description",
-      price: "$0",
+      price: 0,
       duration: "0 weeks",
       image: "",
       outline: [],
@@ -82,9 +82,9 @@ export const CourseManager = () => {
       };
       const updatedCourse = { ...editingCourse, outline: [...editingCourse.outline, newPoint], };
       try {
-        await api.patch(`/api/courses/${editingCourse.id}`, updatedCourse)
+        await api.patch(`/api/courses/${editingCourse._id}`, updatedCourse)
         setEditingCourse(updatedCourse);
-        setCourses((prev) => prev.map((c) => (c.id === updatedCourse.id ? updatedCourse: c)))
+        setCourses((prev) => prev.map((c) => (c._id === updatedCourse._id ? updatedCourse: c)))
       } catch (error) {
         toast({ title: "Error", description: "Failed to add outline point" });
       }
@@ -98,9 +98,9 @@ export const CourseManager = () => {
         outline: editingCourse.outline.filter((p) => p.id !== pointId),
       };
       try {
-        await api.patch(`api/courses/${editingCourse.id}`, updatedCourse)
+        await api.patch(`api/courses/${editingCourse._id}`, updatedCourse)
         setEditingCourse(updatedCourse)
-        setCourses((prev) => prev.map((c) => (c.id === updatedCourse.id ? updatedCourse : c)))
+        setCourses((prev) => prev.map((c) => (c._id === updatedCourse._id ? updatedCourse : c)))
       } catch (error) {
         toast({ title: "Error", description: "Failed to delete outline point" });
       }
@@ -120,7 +120,7 @@ export const CourseManager = () => {
       <div className="grid gap-6">
         {courses.map((course) => (
           <CourseCard
-            key={course.id}
+            key={course._id}
             course={course}
             editingCourse={editingCourse}
             onEdit={handleEdit}
