@@ -7,6 +7,7 @@ interface User {
   email: string;
   name: string;
   photoURL?: string;
+  isAdmin?: boolean;
 }
 
 interface AuthResponse {
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: parsedUser.email,
             name: parsedUser.name,
             photoURL: parsedUser.photoURL,
+            isAdmin: parsedUser.isAdmin || false,
           };
           
           setUser(user);
@@ -69,10 +71,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error("User data is missing in the response.");
       }
 
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("user", JSON.stringify(user)) // save user data
+      const userData = { ...user, isAdmin: user.isAdmin || false}
 
-      setUser(user)
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("user", JSON.stringify(userData)) // save user data
+
+      setUser(userData)
       setError(null)
     } catch (error) {
       setError(error.response?.data.message || "Registration failed");
@@ -88,10 +92,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await api.post<AuthResponse>("/api/users/login", { email, password });
       const { token, user } = response.data;
 
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("user", JSON.stringify(user)) // save user data
+      const userData = { ...user, isAdmin: user.isAdmin || false}
 
-      setUser(user)
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("user", JSON.stringify(userData)) // save user data
+
+      setUser(userData)
     } catch (error) {
       setError(error.response?.data.message || "Login failed");
       console.error("Login failed:", error.response?.data || error.message);
