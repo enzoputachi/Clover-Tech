@@ -26,7 +26,7 @@ export const CourseCard = ({
   onAddOutlinePoint,
   onDeleteOutlinePoint,
 }: CourseCardProps) => {
-  const isEditing = editingCourse?.id === course.id;
+  const isEditing = editingCourse?._id === course._id;
 
   return (
     <Card>
@@ -57,7 +57,7 @@ export const CourseCard = ({
               <Edit2 className="h-4 w-4" />
             </Button>
           )}
-          <Button onClick={() => onDelete(course.id)} variant="destructive">
+          <Button onClick={() => onDelete(course._id)} variant="destructive">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -112,7 +112,7 @@ const CourseEditForm = ({
             onChange={(e) =>
               onEditingCourseChange({
                 ...editingCourse,
-                price: e.target.value,
+                price: parseFloat(e.target.value),
               })
             }
           />
