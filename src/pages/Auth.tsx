@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -14,10 +14,20 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const { login, register } = useAuth();
+  const { login, register, isAuthenticated, user } = useAuth();
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if(isAuthenticated) {
+      if(user?.isAdmin) {
+        navigate("/admin")
+      } else {
+        navigate("/dashboard");
+      }
+    }
+  }, [isAuthenticated, navigate, user])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +39,12 @@ const Auth = () => {
         title: "Welcome back!",
         description: "You have successfully logged in.",
       });
-      navigate("/dashboard");
+      
+      if(user?.isAdmin === true) {
+        navigate("/admin")
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -149,6 +164,7 @@ const Auth = () => {
                   </Button>
                 </form>
               </TabsContent>
+              
             </Tabs>
           </CardContent>
         </Card>
