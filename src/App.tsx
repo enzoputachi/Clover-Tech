@@ -15,11 +15,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Protected Route wrapper component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+const ProtectedRoute = ({ children, isAdminRoute = false }: { children: React.ReactNode, isAdminRoute?: boolean }) => {
+  const { user, isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
+  }
+
+  if (isAdminRoute && !user?.isAdmin) {
+    return <Navigate to="/dashboard" replace />
   }
   
   return <>{children}</>;
@@ -40,7 +44,7 @@ function App() {
             <Route path="/auth" element={<Auth />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
-            <Route path="/admin" element={<Admin />} />
+            {/* <Route path="/admin" element={<Admin />} /> */}
             
             {/* Protected routes */}
             <Route
@@ -52,12 +56,12 @@ function App() {
               }
             />
             <Route
-              // path="/admin/*"
-              // element={
-              //   <ProtectedRoute>
-              //     <Admin />
-              //   </ProtectedRoute>
-              // }
+              path="/admin/*"
+              element={
+                <ProtectedRoute isAdminRoute={true}>
+                  <Admin />
+                </ProtectedRoute>
+              }
             />
           </Routes>
           <Toaster />
