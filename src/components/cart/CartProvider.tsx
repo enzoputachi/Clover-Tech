@@ -26,7 +26,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       const res = await api.get<{ items: Course[], total: number }>("/api/cart");
       setItems(res.data?.items)
       setTotal(res.data?.total)
-      console.log(res.data.items);
+      console.log(res.data?.items);
     } catch (error) {
       console.error("Error fetching cart:", error.response?.data || error.message);
     }
