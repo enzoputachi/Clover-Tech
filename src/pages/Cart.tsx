@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 const Cart = () => {
-  const { items, removeItem, total } = useCart();
+  const { items = [], removeItem, total } = useCart();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
@@ -43,7 +43,7 @@ const Cart = () => {
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           {items.map((item) => (
-            <Card key={item.id} className="mb-4">
+            <Card key={item._id} className="mb-4">
               <CardContent className="flex items-center justify-between p-4">
                 <div>
                   <h3 className="font-semibold">{item.title}</h3>
@@ -51,7 +51,7 @@ const Cart = () => {
                 </div>
                 <Button
                   variant="destructive"
-                  onClick={() => removeItem(item.id)}
+                  onClick={() => removeItem(item._id, item.price)}
                 >
                   Remove
                 </Button>
