@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // A register function
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await api.post<AuthResponse>("/api/users/", {name, email, password});
+      const response = await api.post<AuthResponse>("/api/v1/users/", {name, email, password});
       const { token, user } = response.data;
 
       if (!user) {
@@ -89,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       setError(null);
-      const response = await api.post<AuthResponse>("/api/users/login", { email, password });
+      const response = await api.post<AuthResponse>("/api/v1/users/login", { email, password });
       const { token, user } = response.data;
 
       const userData = { ...user, isAdmin: user.isAdmin || false}

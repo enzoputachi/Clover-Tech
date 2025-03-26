@@ -23,7 +23,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // Fetch cart from API on mount
   const fetchCart = async () => {
     try {
-      const res = await api.get<{ items: Course[], total: number }>("/api/cart");
+      const res = await api.get<{ items: Course[], total: number }>("/api/v1/cart");
       setItems(res.data?.items)
       setTotal(res.data?.total)
       console.log(res.data?.items);
@@ -47,7 +47,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     try {
       // console.log('COURSE IN CART:', course.id);
       
-        await api.post('/api/cart/add', { courseId: course._id, price: course.price })
+        await api.post('/api/v1/cart/add', { courseId: course._id, price: course.price })
         toast({
           title: "Course added to cart",
           description: `${course.title} has been added to your cart.`
@@ -63,7 +63,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     console.log("COURSE ID:", courseId);
     
     try {
-      await api.delete(`/api/cart/${courseId}`, { 
+      await api.delete(`/api/v1/cart/${courseId}`, { 
         data: { price }
       })
       toast({
@@ -84,7 +84,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const clearCart = async() => {
     try {
-      await api.delete('/api/cart');
+      await api.delete('/api/v1/cart');
 
       toast({ title: "Cart cleared", description: "Your cart is now empty." });
       fetchCart();
