@@ -4,13 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Edit2, Save, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-interface Profile {
-  name: string;
-  email: string;
-  role: string;
-  avatar: string;
-}
+import { Profile } from "./types";
 
 export const ProfileSection = () => {
   const { toast } = useToast();
