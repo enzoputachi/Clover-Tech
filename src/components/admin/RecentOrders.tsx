@@ -1,12 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface Order {
-  id: string;
-  customer: string;
-  amount: number;
-  status: "pending" | "completed" | "cancelled";
-  date: string;
-}
+import { Order } from "./types";
 
 export const RecentOrders = () => {
   const orders: Order[] = [
