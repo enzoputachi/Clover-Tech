@@ -7,16 +7,17 @@ import { useEffect, useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "@/api/api";
+import { Course } from "@/components/admin/types";
 
-interface Course {
-  _id: string;
-  title: string;
-  description: string;
-  price: number;
-  duration: string;
-  image: string;
-  outline: Array<{ _id: string; point: string; }>;
-}
+// interface Course {
+//   _id: string;
+//   title: string;
+//   description: string;
+//   price: number;
+//   duration: string;
+//   image: string;
+//   outline: Array<{ courseId: string; point: string; }>;
+// }
 
 const Courses = () => {
   const { addItem } = useCart();
@@ -158,7 +159,7 @@ const Courses = () => {
                     <h4 className="font-bold mb-2">Course Outline:</h4>
                     <ul className="list-disc list-inside">
                       {course.outline.map(point => (
-                        <li key={`${course._id}-${point?._id}`} className="text-sm mb-1">{point.point}</li>
+                        <li key={`${course._id}-${point?.courseId}`} className="text-sm mb-1">{point.point}</li>
                       ))}
                     </ul>
                   </div>
