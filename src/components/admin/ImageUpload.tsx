@@ -3,11 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ImageUploadProps } from './types'
 
-interface ImageUploadProps {
-  onImageSelected: (imageUrl: string) => void;
-  currentImageUrl?: string;
-}
 
 export const ImageUpload = ({ onImageSelected, currentImageUrl }: ImageUploadProps) => {
   const [previewUrl, setPreviewUrl] = useState<string>(currentImageUrl || "");
