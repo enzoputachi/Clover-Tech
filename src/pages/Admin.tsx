@@ -16,7 +16,7 @@ const Admin = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6 mt-6">
         <Card className="col-span-2">
           <CardHeader>
-            <CardTitle className="text-xl font-bold">Welcome Back!</CardTitle>
+            <CardTitle className="text-xl font-bold"> Welcome Back!</CardTitle>
           </CardHeader>
           <CardContent>
             <ProfileSection />
