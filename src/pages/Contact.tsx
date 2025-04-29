@@ -9,7 +9,7 @@ import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from "luc
 const Contact = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar layout="default" />
       <div className="pt-20 px-4 max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Contact Us</h1>

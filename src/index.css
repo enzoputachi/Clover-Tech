@@ -98,4 +98,36 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .gOne{
+    background: linear-gradient(90deg, hsla(191, 75%, 60%, 1) 0%, hsla(248, 87%, 36%, 1) 100%);
+    transition: all 500ms;
+  }
+  /* body::-webkit-scrollbar {
+    display: none;
+  }
+
+  body {
+    scrollbar-width: none;
+  } */
 }
+
+/* Define the stroke animation */
+@keyframes strokeDraw {
+    0% {
+      stroke-dashoffset: 100%; /* Start with the stroke hidden */
+    }
+    50% {
+      stroke-dashoffset: 0; /* Full stroke drawn */
+    }
+    100% {
+      stroke-dashoffset: 100%; /* Stroke hidden again */
+    }
+  }
+  
+  /* Apply the animation to the stroke */
+  .stroke-animation {
+    stroke-dasharray: 5; /* Set the dash length (you may need to adjust this based on the path's length) */
+    stroke-dashoffset: 100%; /* Start with the stroke hidden */
+    animation: strokeDraw 3s ease-in-out infinite; /* Animation: 3 seconds, back and forth, infinitely */
+  }

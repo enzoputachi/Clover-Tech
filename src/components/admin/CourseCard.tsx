@@ -2,31 +2,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit2, Save, Trash2 } from "lucide-react";
-import { Course, CourseOutline } from "./types";
+import { Check, Edit2, Save, Trash2, X } from "lucide-react";
+import { Course, CourseOutline, CourseCardProps, CourseFormProps } from "./types";
 
-interface CourseCardProps {
-  course: Course;
-  editingCourse: Course | null;
-  onEdit: (course: Course) => void;
-  onSave: () => void;
-  onDelete: (id: string) => void;
-  onEditingCourseChange: (course: Course) => void;
-  onAddOutlinePoint: () => void;
-  onDeleteOutlinePoint: (pointId: string) => void;
-}
 
 export const CourseCard = ({
   course,
-  editingCourse,
+  isEditing,
   onEdit,
   onSave,
+  onCancel,
   onDelete,
   onEditingCourseChange,
   onAddOutlinePoint,
   onDeleteOutlinePoint,
 }: CourseCardProps) => {
-  const isEditing = editingCourse?._id === course._id;
 
   return (
     <Card>
@@ -34,10 +24,10 @@ export const CourseCard = ({
         <CardTitle className="text-xl font-bold">
           {isEditing ? (
             <Input
-              value={editingCourse.title}
+              value={course.title}
               onChange={(e) =>
-                onEditingCourseChange({
-                  ...editingCourse,
+                onEditingCourseChange({                
+                  ...course,
                   title: e.target.value,
                 })
               }
@@ -49,7 +39,7 @@ export const CourseCard = ({
         </CardTitle>
         <div className="flex gap-2">
           {isEditing ? (
-            <Button onClick={onSave} variant="outline">
+            <Button onClick={() => onSave(course)} variant="outline">
               <Save className="h-4 w-4" />
             </Button>
           ) : (
@@ -57,18 +47,27 @@ export const CourseCard = ({
               <Edit2 className="h-4 w-4" />
             </Button>
           )}
-          <Button onClick={() => onDelete(course._id)} variant="destructive">
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {isEditing ? (
+            <Button onClick={() => onCancel()} variant="destructive">
+              <X className="h-4 w-4" />
+            </Button>
+          ): (
+            <Button onClick={() => onDelete(course._id)} variant="destructive">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent>
         {isEditing ? (
-          <CourseEditForm
-            editingCourse={editingCourse}
-            onEditingCourseChange={onEditingCourseChange}
+          <CourseForm
+            course={course}
+            onCourseChange={onEditingCourseChange}
+            onSave={onSave}
+            onCancel={onCancel}
             onAddOutlinePoint={onAddOutlinePoint}
             onDeleteOutlinePoint={onDeleteOutlinePoint}
+            layout="default"
           />
         ) : (
           <CourseDisplay course={course} />
@@ -109,12 +108,15 @@ const CourseEditForm = ({
           <label className="block text-sm font-medium mb-1">Regular Price</label>
           <Input
             value={editingCourse.price}
-            onChange={(e) =>
-              onEditingCourseChange({
-                ...editingCourse,
-                price: parseFloat(e.target.value),
-              })
-            }
+            onChange={(e) => {
+              const {value} = e.target;
+              if(value === "" || !isNaN(parseFloat(value))) {
+                onEditingCourseChange({
+                  ...editingCourse,
+                  price: value,
+                })
+              }
+            }}
           />
         </div>
         <div>
@@ -172,7 +174,7 @@ const CourseDisplay = ({ course }: { course: Course }) => {
       <p className="text-gray-600 mb-2">{course.description}</p>
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-primary">{course.price}</span>
+          <span className="text-2xl font-bold text-primary">${course.price}</span>
           {course.salePrice && (
             <span className="text-xl text-gray-400 line-through">
               {course.salePrice}
@@ -188,12 +190,12 @@ const CourseDisplay = ({ course }: { course: Course }) => {
           className="w-full h-48 object-cover rounded-md mb-2"
         />
       )}
-      {course.outline.length > 0 && (
+      {course.outline?.length > 0 && (
         <div className="mt-4">
           <h4 className="font-medium mb-2">Course Outline:</h4>
           <ul className="list-disc list-inside">
             {course.outline.map((point) => (
-              <li key={point.id}>{point.point}</li>
+              <li key={point._id}>{point.point}</li>
             ))}
           </ul>
         </div>
@@ -219,12 +221,12 @@ const CourseOutlineEditor = ({
     <div>
       <div className="flex justify-between items-center mb-2">
         <label className="block text-sm font-medium">Course Outline</label>
-        <Button onClick={onAddOutlinePoint} variant="outline" size="sm">
+        <Button onClick={onAddOutlinePoint} variant="outline" size="sm" className="mt-3" >
           Add Point
         </Button>
       </div>
       {outline.map((point, index) => (
-        <div key={point.id} className="flex gap-2 mb-2">
+        <div key={point._id || point.outlineId} className="flex gap-2 mb-2">
           <Input
             value={point.point}
             onChange={(e) => {
@@ -235,9 +237,10 @@ const CourseOutlineEditor = ({
                 outline: newOutline,
               });
             }}
+            placeholder="Enter point"
           />
           <Button
-            onClick={() => onDeleteOutlinePoint(point.id)}
+            onClick={() => onDeleteOutlinePoint(point._id)}
             variant="destructive"
             size="icon"
           >
@@ -247,4 +250,124 @@ const CourseOutlineEditor = ({
       ))}
     </div>
   );
+};
+
+export const CourseForm = ({
+  course,
+  onCourseChange,
+  onSave,
+  onSubmit,
+  onCancel,
+  onAddOutlinePoint,
+  onDeleteOutlinePoint,
+  layout = "default",
+}: CourseFormProps) => {
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    onCourseChange({...course, [name]:value})
+  }
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   await onSave(course);
+  // }
+
+  const formFields = (
+    <div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Description</label>
+        <Textarea
+          name="description"
+          value={course?.description}
+          onChange={handleChange}
+          className="min-h-[100px]"
+          placeholder="Enter course description"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Regular Price</label>
+          <Input
+            name="price"
+            value={course?.price}
+            onChange={(e) => 
+              onCourseChange({
+                ...course,
+                price: e.target.value,
+              })
+            }
+            placeholder="Enter course price"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Sale Price</label>
+          <Input
+            name=""
+            value={course?.salePrice || ""}
+            onChange={(e) =>
+              onCourseChange({
+                ...course,
+                salePrice: e.target.value,
+              })
+            }
+            placeholder="Optional sale price"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Duration</label>
+          <Input
+            name="duration"
+            value={course?.duration}
+            onChange={handleChange}
+            placeholder="Enter course duration"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Image URL</label>
+        <Input
+          name="image"
+          value={course?.image}
+          onChange={handleChange}
+          placeholder="Enter course image link"
+        />
+      </div>
+      <CourseOutlineEditor
+        outline={course.outline}
+        onEditingCourseChange={onCourseChange}
+        editingCourse={course}
+        onAddOutlinePoint={onAddOutlinePoint}
+        onDeleteOutlinePoint={onDeleteOutlinePoint}
+      />
+    </div>
+  );
+
+  if (layout === "card") {
+    return (
+      <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-xl font-bold">
+          <Input
+            value={course.title}
+            onChange={(e) => onCourseChange({ ...course, title: e.target.value })}
+            className="max-w-sm"
+            placeholder="Enter course title"
+          />
+        </CardTitle>
+        <div className="flex gap-2">
+          <Button onClick={() => onSubmit(course)} variant="outline">
+            <Check className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => onCancel()} variant="destructive">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>{formFields}</CardContent>
+    </Card>
+    )
+  }
+ 
+  return <div className="space-y-4">{formFields}</div>
 };

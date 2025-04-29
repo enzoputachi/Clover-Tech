@@ -5,11 +5,13 @@ import { QuickActions } from "@/components/admin/QuickActions";
 import { RecentOrders } from "@/components/admin/RecentOrders";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CourseManager } from "@/components/admin/CourseManager";
+import { Navbar } from "@/components/Navbar";
 
 const Admin = () => {
   return (
     <div className="container mx-auto py-8">
-      <StatsCards />
+      <Navbar layout="admin" />
+      {/* <StatsCards /> */}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6 mt-6">
         <Card className="col-span-2">
@@ -21,10 +23,10 @@ const Admin = () => {
           </CardContent>
         </Card>
 
-        <QuickActions />
+        {/* <QuickActions /> */}
       </div>
 
-      <RecentOrders />
+      {/* <RecentOrders /> */}
 
       <div className="mt-6">
         <ContentManager />

@@ -6,10 +6,11 @@ import api from '@/api/api';
 interface CartContextType {
   items: Course[];
   addItem: (course: Course) => void;
-  removeItem: (courseId: string, price: number) => void;
+  removeItem: (courseId: string, price: number | string) => void;
   total: number;
   clearCart: () => void;
   fetchCart: () => void;
+  clearLocalCart: () => void;
 }
 
 
@@ -54,23 +55,31 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         });
         fetchCart();
     } catch (error) {
-      console.error("Error adding couse to cart:", error?.message || error);
+      console.error("Error adding course to cart:", error?.message || error);
+      toast({
+        title: "Error adding course",
+        description: `${course.title} already exists in cart.`
+      });
     }
   };
 
   const removeItem = async (courseId: string, price: number) => {
     console.log("PRICE:", price);
-    console.log("COURSE ID:", courseId);
-    
+    console.log("COURSE ID:", courseId);    
     try {
-      await api.delete(`/api/v1/cart/${courseId}`, { 
-        data: { price }
-      })
-      toast({
-        title: "Course removed",
-        description: "The course has been removed from your cart."
-      });
-      fetchCart()
+      const confirmDelete = window.confirm("confirm delete")
+
+      if(confirmDelete) {
+        await api.delete(`/api/v1/cart/${courseId}`, { 
+          data: { price }
+        })
+        toast({
+          title: "Course removed",
+          description: "The course has been removed from your cart."
+        });
+        fetchCart()
+      }
+      
     } catch (error) {
       console.error("Error removing course:", error?.message || error);
       
@@ -93,8 +102,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const clearLocalCart = () => {
+    setItems([]);
+    setTotal(0);
+  }
+
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, total, clearCart, fetchCart }}>
+    <CartContext.Provider value={{ 
+      items, 
+      addItem, 
+      removeItem, 
+      total, 
+      clearCart, 
+      fetchCart,
+      clearLocalCart 
+    }}>
       {children}
     </CartContext.Provider>
   );

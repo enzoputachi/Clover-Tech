@@ -2,19 +2,23 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Plus } from "lucide-react";
-import { CourseCard } from "./CourseCard";
+import { CourseCard, CourseForm } from "./CourseCard";
 import { Course } from "./types";
 import api from "@/api/api";
 
 export const CourseManager = () => {
   const { toast } = useToast();
   const [courses, setCourses] = useState<Course[]>([ ]);
+  const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
+
+  // Different states for adding and editing course
+  const [newCourse, setNewCourse] = useState<Course | null>(null);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const { data } = await api.get<Course[]>('/api/courses')
+        const { data } = await api.get<Course[]>('/api/v1/courses')
         setCourses(data)
         console.log(data);
       } catch (error) {
@@ -22,34 +26,71 @@ export const CourseManager = () => {
       }
     };
     fetchCourses();
-  }, [])
+  }, [toast])
 
   const handleEdit = (course: Course) => {
-    setEditingCourse(course);
+    setEditingCourse({...course});
+    setEditingCourseId(course._id);
+    console.log("course:", {...course});    
   };
 
+  const handleSubmit = async (course: Course) => {
+    if (!course.isNew) return;
 
-  const handleSave = async () => {
-    if (editingCourse) {
-      try {
-        await api.patch(`/api/courses/${editingCourse._id}`, editingCourse);
-        setCourses((prev) => prev.map((c) => (c._id === editingCourse._id ? editingCourse : c)));
-        setEditingCourse(null);
-        toast({ title: "Course updated", description: "Your changes have been saved successfully."})
-      } catch (error) {
-        toast({ title: "Error", description: "Failed to update course"})
-      }
+    try {
+      const { data: { course: newCourse } } = await api.post("/api/v1/courses", course);
+      console.log("API data:", newCourse);
+
+      // const newCourse = course
+      setCourses((prev) => [...prev, newCourse]);
+      // setCourses((prev) => prev.map((c) => (c._id === course._id ? course : c)));
+      setNewCourse(null);
+      toast({ title: "Course created", description: "New course created successfully."})
+    } catch (error) {
+      console.error("Error creating course:", error);
+      toast({ title: "Error", description: "Failed to create course"})
+    }
+  }
+ 
+
+  const handleSave = async (course: Course) => {
+    if (!editingCourseId) return;
+    const sanitizedOutline = course.outline.map(({outlineId, ...rest}) => rest);
+    const sanitizedCourse = { ...course, outline: sanitizedOutline};
+
+    try {     
+      const { data: updatedCourse } = await api.patch(`/api/v1/courses/${course._id}`, sanitizedCourse);
+      console.log("Updated course after sani:", updatedCourse);
+      
+
+      setCourses((prev) => prev.map((c) => (c._id === updatedCourse?._id ? updatedCourse : c)));
+      setEditingCourse(null);
+      setEditingCourseId(null);
+      toast({ title: "Course updated", description: "Your changes have been saved successfully."})
+    } catch (error) {
+      console.log("Error Saving course:", error);      
+      toast({ title: "Error", description: "Failed to update course"})
     }
   };
 
+  const handleCancel = () => {
+    setNewCourse(null);
+    setEditingCourse(null);
+  }
+
   const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm("confirm delete")
+
+    
     try {
-      await api.delete(`/api/courses/${id}`)
+     if(confirmDelete) {
+      await api.delete(`/api/v1/courses/${id}`)
       setCourses(courses.filter((c) => c._id !== id));
       toast({
         title: "Course deleted",
         description: "The course has been removed successfully.",
       });
+     }
     } catch (error) {
       toast({ title: "Error", description: "Failed to delete course" });
     }
@@ -57,48 +98,57 @@ export const CourseManager = () => {
 
   const handleAdd = async () => {
     const newCourse: Course = {
-      _id: "",
-      title: "New Course",
-      description: "Course description",
-      price: 0,
-      duration: "0 weeks",
+      title: "",
+      description: "",
+      price: undefined,
+      duration: "",
       image: "",
       outline: [],
+      isNew: true,
     };
     try {
-      const { data } = await api.post("/api/courses", newCourse)
-      setCourses([...courses, newCourse]);
-      setEditingCourse(newCourse);
+    //  const { data } = await api.post("/api/v1/courses", newCourse)
+
+      // setCourses([...courses, newCourse]);
+      setNewCourse(newCourse);
     } catch (error) {
+      console.error("Error adding course:", error);      
       toast({ title: "Error", description: "Failed to add course" });
     }
   };
 
   const handleAddOutlinePoint = async() => {
-    if (editingCourse) {
+    try {
+
       const newPoint = {
-        id: Date.now().toString(),
-        point: "New point",
+        outlineId: Date.now().toString(),
+        point: "",
       };
-      const updatedCourse = { ...editingCourse, outline: [...editingCourse.outline, newPoint], };
-      try {
-        await api.patch(`/api/courses/${editingCourse._id}`, updatedCourse)
+      console.log("New Ponit", newPoint);
+
+      if(editingCourseId) {
+        console.log("current courseid", editingCourseId);        
+        const updatedCourse = { ...editingCourse, outline: [...editingCourse.outline, newPoint], };
         setEditingCourse(updatedCourse);
         setCourses((prev) => prev.map((c) => (c._id === updatedCourse._id ? updatedCourse: c)))
-      } catch (error) {
-        toast({ title: "Error", description: "Failed to add outline point" });
+      } else if (newCourse) {
+        const updatedCourse = { ...newCourse, outline: [...newCourse.outline, newPoint], };
+        setNewCourse(updatedCourse)
       }
+      
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to add outline point" });
     }
   };
 
   const handleDeleteOutlinePoint = async (pointId: string) => {
-    if (editingCourse) {
+    if (setEditingCourse) {
       const updatedCourse = {
         ...editingCourse,
-        outline: editingCourse.outline.filter((p) => p.id !== pointId),
+        outline: editingCourse.outline.filter((p) => p._id !== pointId),
       };
       try {
-        await api.patch(`api/courses/${editingCourse._id}`, updatedCourse)
+        // await api.patch(`api/v1/courses/${editingCourse._id}`, updatedCourse)
         setEditingCourse(updatedCourse)
         setCourses((prev) => prev.map((c) => (c._id === updatedCourse._id ? updatedCourse : c)))
       } catch (error) {
@@ -117,14 +167,26 @@ export const CourseManager = () => {
         </Button>
       </div>
 
-      <div className="grid gap-6">
+      {newCourse ? (
+        <CourseForm
+          course={newCourse}
+          onCourseChange={setNewCourse}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          onAddOutlinePoint={handleAddOutlinePoint}
+          onDeleteOutlinePoint={handleDeleteOutlinePoint}
+          layout="card"
+        />
+      ) : (
+        <div className="grid gap-6">
         {courses.map((course) => (
           <CourseCard
             key={course._id}
-            course={course}
-            editingCourse={editingCourse}
+            course={editingCourseId === course._id && editingCourse ? editingCourse : course}
+            isEditing={editingCourseId === course._id}
             onEdit={handleEdit}
             onSave={handleSave}
+            onCancel={() => setEditingCourseId(null)}
             onDelete={handleDelete}
             onEditingCourseChange={setEditingCourse}
             onAddOutlinePoint={handleAddOutlinePoint}
@@ -132,6 +194,7 @@ export const CourseManager = () => {
           />
         ))}
       </div>
+      )}
     </div>
   );
 };

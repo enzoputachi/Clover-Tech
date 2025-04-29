@@ -1,4 +1,5 @@
 import api from "@/api/api";
+import { useCart } from "@/components/cart/CartProvider";
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 
@@ -6,6 +7,7 @@ interface User {
   id: string;
   email: string;
   name: string;
+  role?: string;
   photoURL?: string;
   isAdmin?: boolean;
 }
@@ -19,7 +21,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   register: (name: string, email: string, password: string) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   logout: () => void;
   error: string | null;
 }
@@ -31,6 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // const storedUser = localStorage.getItem("user") //Get user from localstorage
   const [error, setError] = useState<string | null>(null);
   // const navigate = useNavigate();
+  // const { clearLocalCart } = useCart();
 
   useEffect(() => {
     const initializeAuth = async() => {
@@ -86,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   // login function 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User> => {
     try {
       setError(null);
       const response = await api.post<AuthResponse>("/api/v1/users/login", { email, password });
@@ -98,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("user", JSON.stringify(userData)) // save user data
 
       setUser(userData)
+      return userData;
     } catch (error) {
       setError(error.response?.data.message || "Login failed");
       console.error("Login failed:", error.response?.data || error.message);
@@ -110,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("user") // remove user data
     setUser(null);
     setError(null);
+    // clearLocalCart();
     // navigate("/auth")
   };
 
@@ -127,7 +132,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
+};
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

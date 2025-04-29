@@ -6,22 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Edit2, Plus, Save, Trash2, Link as LinkIcon } from "lucide-react";
 import { ImageUpload } from "./ImageUpload";
-
-interface Section {
-  id: string;
-  title: string;
-  content: string;
-  type: "hero" | "services" | "testimonials" | "blog";
-  imageUrl?: string;
-}
-
-interface PortfolioItem {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  projectUrl: string;
-}
+import { PortfolioItem, Section } from './types.ts'
 
 export const ContentManager = () => {
   const { toast } = useToast();

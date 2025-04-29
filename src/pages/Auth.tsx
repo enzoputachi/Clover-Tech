@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/components/cart/CartProvider";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,13 +19,12 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { fetchCart } = useCart();
 
   useEffect(() => {
-    if(isAuthenticated) {
-      if(user?.isAdmin) {
-        navigate("/admin")
-      } else {
-        navigate("/dashboard");
+    if(isAuthenticated && user) {
+      if(user) {
+        navigate(user.isAdmin ? "/admin" : "/dashboard")
       }
     }
   }, [isAuthenticated, navigate, user])
@@ -34,16 +34,16 @@ const Auth = () => {
     setIsLoading(true);
     
     try {
-      await login(email, password);
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
-      });
+      const response = await login(email, password);
+      // console.log("Login Response:", response);
       
-      if(user?.isAdmin === true) {
-        navigate("/admin")
-      } else {
-        navigate("/dashboard");
+      if(response) {
+        
+        fetchCart();
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully logged in.",
+        });
       }
     } catch (error) {
       toast({
@@ -76,7 +76,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar layout="default" />
       <div className="pt-20 px-4 max-w-7xl mx-auto flex justify-center items-center min-h-[calc(100vh-16rem)]">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">

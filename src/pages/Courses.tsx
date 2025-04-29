@@ -130,7 +130,7 @@ const Courses = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar layout="default" />
       <div className="pt-20 px-4 max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Our Courses</h1>
@@ -159,7 +159,7 @@ const Courses = () => {
                     <h4 className="font-bold mb-2">Course Outline:</h4>
                     <ul className="list-disc list-inside">
                       {course.outline.map(point => (
-                        <li key={`${course._id}-${point?.courseId}`} className="text-sm mb-1">{point.point}</li>
+                        <li key={`${course._id}-${point?._id}`} className="text-sm mb-1">{point.point}</li>
                       ))}
                     </ul>
                   </div>
@@ -171,7 +171,7 @@ const Courses = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex justify-between items-center">
-                  <span className="text-2xl font-bold text-primary">{course.price}</span>
+                  <span className="text-2xl font-bold text-primary">${course.price}</span>
                   <span className="text-gray-600">{course.duration}</span>
                 </div>
               </CardContent>

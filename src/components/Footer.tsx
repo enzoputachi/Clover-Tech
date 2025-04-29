@@ -3,7 +3,7 @@ import { Input } from "./ui/input";
 
 export const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
@@ -12,9 +12,21 @@ export const Footer = () => {
               Transforming ideas into digital reality. We help businesses grow with innovative software solutions.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white">Twitter</a>
-              <a href="#" className="text-gray-400 hover:text-white">LinkedIn</a>
-              <a href="#" className="text-gray-400 hover:text-white">GitHub</a>
+              <a 
+                href="#" 
+                onClick={(e) => e.preventDefault()} 
+                className="text-gray-400 hover:text-white">Twitter</a>
+              {/* <a href="#" onClick={(e) => e.preventDefault()} className="text-gray-400 hover:text-white">LinkedIn</a> */}
+              <a 
+                href="https://wa.me/message/5KXOZ3ERU2H7A1"
+                target="_blank"
+                rel="noopener noreferrer" 
+                className="text-gray-400 hover:text-white">WhatsApp</a>
+              <a 
+                href="https://www.instagram.com/_clover_tech?igsh=MXFjODhrNHN3MDRqOQ=="
+                rel="noopener noreferrer" 
+                target="_blank" 
+                className="text-gray-400 hover:text-white">Instagram</a>
             </div>
           </div>
           

@@ -5,16 +5,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Edit2, Save, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Profile } from "./types";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const ProfileSection = () => {
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile>({
-    name: "John Doe",
+    name: "John Toe",
     email: "john@example.com",
     role: "Administrator",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"
   });
   const [editingProfile, setEditingProfile] = useState(false);
+  const { user } = useAuth();
 
   const handleProfileEdit = () => {
     setEditingProfile(!editingProfile);
@@ -45,8 +47,8 @@ export const ProfileSection = () => {
     <div className="flex items-center space-x-4">
       <div className="relative">
         <Avatar className="h-20 w-20">
-          <AvatarImage src={profile.avatar} alt={profile.name} />
-          <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
+          <AvatarImage src={profile.avatar} alt={user.name} />
+          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
         </Avatar>
         <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 cursor-pointer">
           <div className="rounded-full bg-primary p-1">
@@ -65,21 +67,21 @@ export const ProfileSection = () => {
         {editingProfile ? (
           <>
             <Input
-              value={profile.name}
+              value={user.name}
               onChange={(e) => setProfile({ ...profile, name: e.target.value })}
               className="max-w-sm"
             />
             <Input
-              value={profile.email}
+              value={user.email}
               onChange={(e) => setProfile({ ...profile, email: e.target.value })}
               className="max-w-sm"
             />
           </>
         ) : (
           <>
-            <h2 className="text-2xl font-bold">{profile.name}</h2>
-            <p className="text-gray-600">{profile.email}</p>
-            <p className="text-sm text-muted-foreground">{profile.role}</p>
+            <h2 className="text-2xl font-bold">{user.name}</h2>
+            <p className="text-gray-600">{user.email}</p>
+            <p className="text-sm text-muted-foreground">{user?.role}</p>
           </>
         )}
         <Button onClick={handleProfileEdit} variant="outline" size="sm">

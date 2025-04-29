@@ -6,13 +6,15 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import api from "@/api/api";
+import  PaystackPop  from '@paystack/inline-js';
 
 const Checkout = () => {
   const { items, total, clearCart } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   // Check authentication on component mount
   if (!isAuthenticated) {
@@ -20,21 +22,103 @@ const Checkout = () => {
     return null;
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    const formData = new FormData(e.currentTarget);
+    const { email, amount } = Object.fromEntries(formData.entries()) as {
+      email: string;
+      amount: string;
+    }
+
+    // Validate input
+    if (!email.trim() || !amount.trim() || Number(amount) <= 0) {
+      toast({
+        title: "Invalid input",
+        description: "Please neter your email",
+        // status: "error"
+      })
+      setLoading(false);
+      return;
+    }
+
+    // Paystack amount in kobo
+    const payload = { email, amount: Math.round(parseFloat(amount) * 100) }
+    // console.log("Payload:", payload);
+
+    try {
+      const { data } = await api.post(`/api/v1/paystack/initialize`, payload);
+      console.log("Initialization Response: ", data);
+
+      const { reference, access_code } = data.data;
+      console.log("access code:", access_code);
+      
+
+      const paystack = new PaystackPop();
+      // Paystack.resumeTransaction(access_code);
+
+      paystack.newTransaction({
+        key: 'pk_test_73e068069c3d3111592867a42c07d8009aafe82f',
+        email,
+        amount: payload.amount,
+        reference,
+        onSuccess: async(transaction) => {
+          try {
+            const verifyRes = await api.get(`/api/v1/paystack/verify/${transaction.reference}`);
+
+            console.log( 'TRANSACTION REFF:', transaction.reference);
+            
+
+            if (verifyRes.data.data.status === 'success') {
+              toast({
+                title: "Payment successful",
+                description: 'Thank you1 confirmation email sent.',
+                status: 'success',
+              })
+            } else {
+              throw new Error('Payment not marked successful')
+            }
+          } catch (verifyError) {
+            console.error('Verification error:', verifyError);
+            toast({
+              title: 'Verification failed',
+              description: "could not verify payment. Contact support",
+              status: 'error',
+            })
+          } finally {
+            setLoading(false);
+          }
+        },
+        onCancel: () => {
+          toast({
+            title: 'Payment cancelled',
+            description: 'You closed the payment window.',
+            status: 'info',
+          });
+          setLoading(false)
+        }
+      });
+      
+    } catch (error) {
+      console.error(error?.response?.data || error.message);
+      // setLoading(false)
+      toast({
+        title: "Initialization failed",
+        description: error?.response?.data || 'Could not start payment. Please try again.',
+        status: 'error',
+      })
+      return;
+    }
     
     toast({
       title: "Order completed!",
       description: "Thank you for your purchase. You will receive an email confirmation shortly."
     });
     
-    clearCart();
+    // clearCart();
     setLoading(false);
-    navigate('/courses');
+    // navigate('/courses');
   };
 
   if (items.length === 0) {
@@ -62,14 +146,16 @@ const Checkout = () => {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Card Number</label>
-                  <Input 
+                  {/* <label className="block text-sm font-medium mb-1">Card Number</label> */}
+                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <Input
+                    defaultValue={user?.email}
+                    name="email" 
                     required
-                    placeholder="1234 5678 9012 3456"
-                    maxLength={19}
+                    placeholder="Enter your email"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                {/* <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Expiry Date</label>
                     <Input 
@@ -87,12 +173,14 @@ const Checkout = () => {
                       type="password"
                     />
                   </div>
-                </div>
+                </div> */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">Name on Card</label>
-                  <Input 
+                  <label className="block text-sm font-medium mb-1">Amount</label>
+                  <Input
+                    defaultValue={`${total.toFixed(2)}`}
+                    name="amount" 
                     required
-                    placeholder="John Doe"
+                    placeholder="Enter amount"
                   />
                 </div>
                 <Button 
@@ -120,7 +208,7 @@ const Checkout = () => {
             <CardContent>
               <div className="space-y-4">
                 {items.map(course => (
-                  <div key={course.id} className="flex justify-between">
+                  <div key={course._id} className="flex justify-between">
                     <span>{course.title}</span>
                     <span>{course.price}</span>
                   </div>

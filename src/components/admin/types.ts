@@ -1,10 +1,11 @@
 export interface CourseOutline {
-  _id: string;
+  _id?: string;
+  outlineId?: string; // This a false id to side step react restrictions
   point: string;
 }
 
 export interface Course {
-  _id: string;
+  _id?: string;
   title: string;
   description: string;
   price: number | string;
@@ -18,28 +19,30 @@ export interface Course {
 export interface CourseFormProps {
   course: Course;
   onCourseChange: (course: Course) => void;
-  onSave: (course: Course) => Promise<void>;
+  onSave?: (course: Course) => Promise<void>;
+  onSubmit?: (course: Course) => Promise<void>;
   onCancel: () => void;
   onAddOutlinePoint: () => void;
   onDeleteOutlinePoint: (pointId: string) => void;
   layout?: "default" | "card";
 }
 
-export interface CreateCourse {
-  title: string;
-  description: string;
-  price: number;
-  salePrice?: string;
-  duration: string;
-  image: string;
-  outline: CourseOutline[];
-}
+// export interface CreateCourse {
+//   title: string;
+//   description: string;
+//   price: number;
+//   salePrice?: string;
+//   duration: string;
+//   image: string;
+//   outline: CourseOutline[];
+// }
 
 export interface CourseCardProps {
   course: Course;
   isEditing: boolean;
   onEdit: (course: Course) => void;
   onSave: (course: Course) => Promise<void>;
+  // onsubmit: (course: Course) => Promise<void>;
   onCancel: () => void;
   onDelete: (id: string) => void;
   onEditingCourseChange: (course: Course) => void;

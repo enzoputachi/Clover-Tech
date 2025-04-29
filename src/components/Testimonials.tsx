@@ -7,19 +7,19 @@ export const Testimonials = () => {
       name: "Sarah Johnson",
       role: "CEO, TechStart",
       content: "Working with Clover Tech transformed our digital presence. Their expertise in web development is unmatched.",
-      image: "photo-1649972904349-6e44c42644a7",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
     },
     {
       name: "Michael Chen",
       role: "CTO, InnovateCorp",
       content: "The team's attention to detail and technical prowess helped us launch our platform ahead of schedule.",
-      image: "photo-1581091226825-a6a2a5aee158",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
     },
     {
       name: "Emily Davis",
       role: "Product Manager, NextGen",
       content: "Outstanding service and exceptional results. They truly understand modern web development.",
-      image: "photo-1486312338219-ce68d2c6f44d",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
     },
   ];
 
@@ -33,7 +33,7 @@ export const Testimonials = () => {
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
                   <Avatar className="w-16 h-16 mb-4">
-                    <AvatarImage src={`https://source.unsplash.com/${testimonial.image}`} />
+                    <AvatarImage src={`${testimonial.image}`} />
                     <AvatarFallback>{testimonial.name[0]}</AvatarFallback>
                   </Avatar>
                   <p className="text-gray-600 mb-4">{testimonial.content}</p>

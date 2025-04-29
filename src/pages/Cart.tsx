@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import PaystackPop from '@paystack/inline-js';
 
 const Cart = () => {
   const { items = [], removeItem, total } = useCart();
@@ -22,6 +23,8 @@ const Cart = () => {
       return;
     }
     navigate('/checkout');
+    // const popup = new PaystackPop()
+    // popup.resumeTransaction(access_code)
   };
 
   if (items.length === 0) {

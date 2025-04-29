@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar layout="default" />
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Sidebar Navigation */}

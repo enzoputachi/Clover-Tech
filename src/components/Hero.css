@@ -1,0 +1,20 @@
+/* Define the stroke animation */
+@keyframes strokeDraw {
+    0% {
+      stroke-dashoffset: 100%; /* Start with the stroke hidden */
+    }
+    50% {
+      stroke-dashoffset: 0; /* Full stroke drawn */
+    }
+    100% {
+      stroke-dashoffset: 100%; /* Stroke hidden again */
+    }
+  }
+  
+  /* Apply the animation to the stroke */
+  .stroke-animation {
+    stroke-dasharray: 500; /* Set the dash length (you may need to adjust this based on the path's length) */
+    stroke-dashoffset: 100%; /* Start with the stroke hidden */
+    animation: strokeDraw 3s ease-in-out infinite; /* Animation: 3 seconds, back and forth, infinitely */
+  }
+  
