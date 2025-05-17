@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "./cart/CartProvider";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import logo from '/logo.jpg'
 
 export const Navbar = ({layout}: {layout: "default" | "admin"}) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,8 +31,9 @@ export const Navbar = ({layout}: {layout: "default" | "admin"}) => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="text-xl font-bold text-primary">
-                Clover Tech
+                <img src={logo} alt="" className="w-10" />
               </Link>
+              
             </div>
     
             <div className="hidden lg:flex items-center space-x-8">

@@ -37,22 +37,22 @@ const Checkout = () => {
       toast({
         title: "Invalid input",
         description: "Please neter your email",
-        // status: "error"
+        status: "error"
       })
       setLoading(false);
       return;
     }
 
     // Paystack amount in kobo
-    const payload = { email, amount: Math.round(parseFloat(amount) * 100) }
-    // console.log("Payload:", payload);
+    const payload = { email, amount: Math.round(parseFloat(amount) * 100), userId: user?.id}
+    console.log("Payload:", payload);
 
     try {
       const { data } = await api.post(`/api/v1/paystack/initialize`, payload);
-      console.log("Initialization Response: ", data);
+      // console.log("Initialization Response: ", data);
 
       const { reference, access_code } = data.data;
-      console.log("access code:", access_code);
+      // console.log("access code:", access_code);
       
 
       const paystack = new PaystackPop();
@@ -71,6 +71,8 @@ const Checkout = () => {
             
 
             if (verifyRes.data.data.status === 'success') {
+              console.log( 'Verification response: ', verifyRes);
+              
               toast({
                 title: "Payment successful",
                 description: 'Thank you1 confirmation email sent.',

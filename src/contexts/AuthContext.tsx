@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const parsedUser = JSON.parse(storedUser);
 
           const user: User = {
-            id: parsedUser._id, // Map _id to id if needed
+            id: parsedUser.id, // Map _id to id if needed
             email: parsedUser.email,
             name: parsedUser.name,
             photoURL: parsedUser.photoURL,
@@ -99,6 +99,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       localStorage.setItem("authToken", token);
       localStorage.setItem("user", JSON.stringify(userData)) // save user data
+      console.log("RESPONSE USER:", user);
+      
 
       setUser(userData)
       return userData;
