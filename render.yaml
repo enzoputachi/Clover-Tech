@@ -1,0 +1,6 @@
+# render.yaml
+# Rewrite all routes to index.html so React Router can handle them
+routes:
+  - type: rewrite
+    source: /*
+    destination: /index.html
